@@ -1,4 +1,4 @@
-# fis-command-release
+# tch-command-release
 
 ## Usage
 

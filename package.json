@@ -1,13 +1,13 @@
 {
-    "name" : "fis-command-release",
-    "description" : "fis release command.",
-    "version" : "0.9.7",
-    "author" : "FIS Team <fis@baidu.com>",
+    "name" : "tch-command-release",
+    "description" : "tch release command.",
+    "version" : "0.0.1",
+    "author" : "gerdy",
     "homepage" : "http://fis.baidu.com/",
-    "keywords": [ "fis" ],
+    "keywords": [ "tch" ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/fis-dev/fis-command-release.git"
+        "url": "https://github.com/gerdy/fis-command-release.git"
     },
     "engines" : {
         "node" : ">= 0.8.0"
