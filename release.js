@@ -171,7 +171,6 @@ exports.register = function(commander){
             var options = arguments[arguments.length - 1];
             
             fis.log.throw = true;
-            
             //configure log
             if(options.verbose){
                 fis.log.level = fis.log.L_ALL;

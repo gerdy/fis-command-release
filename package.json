@@ -1,7 +1,7 @@
 {
   "name": "tch-command-release",
   "description": "tch release command.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": {
     "name": "gerdy"
   },
@@ -32,7 +32,7 @@
   "bugs": {
     "url": "https://github.com/gerdy/fis-command-release/issues"
   },
-  "_id": "tch-command-release@0.0.1",
-  "_shasum": "48d493d6d719611d7a40592790bcb73f6636c939",
-  "_from": "tch-command-release@^0.0.1"
+  "_id": "tch-command-release@0.0.2",
+  "_shasum": "9c9be3c1503b0afe5804a59f14813f71ac0ce80a",
+  "_from": "tch-command-release@^0.0.2"
 }
