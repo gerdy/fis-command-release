@@ -31,7 +31,7 @@ exports.register = function(commander){
             .on('change', listener)
             .on('unlink', listener)
             .on('error', function(err){
-                //fis.log.error(err);
+                fis.log.error(err);
             });
     }
     
@@ -103,7 +103,6 @@ exports.register = function(commander){
             collection[file.subpath] = file;
             process.stdout.write(flag);
         };
-        
         try {
             //release
             fis.release(opt, function(ret){
@@ -134,9 +133,27 @@ exports.register = function(commander){
             }
         }
     }
-    
+    var serverRoot = (function(){
+        var confRootStr = ".",
+            confRoot = fis.util.realpath(confRootStr);
+        if(confRoot) return confRoot;
+        fis.log.notice("正在尝试在 "+confRootStr+" 创建文件夹"); 
+        fis.util.mkdir(confRootStr);
+        return fis.util.realpath(confRootStr);
+        // var key = 'FIS_SERVER_DOCUMENT_ROOT';
+        // if(process.env && process.env[key]){
+        //     var path = process.env[key];
+        //     if(fis.util.exists(path) && !fis.util.isDir(path)){
+        //         fis.log.error('invalid environment variable [' + key + '] of document root [' + path + ']');
+        //     }
+        //     return path;
+        // } else {
+        //     fis.log.error("配置的root路径："+confRootStr+"不存在，当前的根目录在临时目录");
+        //     return fis.project.getTempPath('www');
+        // }
+    })();
     commander
-        .option('-d, --dest <names>', 'release output destination', String, 'preview')
+        .option('-d, --dest <names>', 'release output destination', String, fis.config.get('server.root', "./output"))
         .option('-m, --md5 [level]', 'md5 release option', Number)
         .option('-D, --domains', 'add domain name', Boolean, false)
         .option('-l, --lint', 'with lint', Boolean, false)
@@ -146,12 +163,11 @@ exports.register = function(commander){
         .option('-w, --watch', 'monitor the changes of project')
         .option('-L, --live', 'automatically reload your browser')
         .option('-c, --clean', 'clean compile cache', Boolean, false)
-        .option('-r, --root <path>', 'set project root')
+        .option('-r, --root <path>', 'set project root',serverRoot)
         .option('-f, --file <filename>', 'set fis-conf file')
         .option('-u, --unique', 'use unique compile caching', Boolean, false)
         .option('--verbose', 'enable verbose output', Boolean, false)
         .action(function(){
-            
             var options = arguments[arguments.length - 1];
             
             fis.log.throw = true;
