@@ -133,25 +133,22 @@ exports.register = function(commander){
             }
         }
     }
-    var serverRoot = (function(){
-        var confRootStr = fis.config.get('server.root', "./output"),
-            confRoot = fis.util.realpath(confRootStr);
-        if(confRoot) return confRoot;
-        fis.log.notice("正在尝试在 "+confRootStr+" 创建文件夹"); 
-        fis.util.mkdir(confRootStr);
-        return fis.util.realpath(confRootStr);
-        // var key = 'FIS_SERVER_DOCUMENT_ROOT';
-        // if(process.env && process.env[key]){
-        //     var path = process.env[key];
-        //     if(fis.util.exists(path) && !fis.util.isDir(path)){
-        //         fis.log.error('invalid environment variable [' + key + '] of document root [' + path + ']');
-        //     }
-        //     return path;
-        // } else {
-        //     fis.log.error("配置的root路径："+confRootStr+"不存在，当前的根目录在临时目录");
-        //     return fis.project.getTempPath('www');
-        // }
-    })();
+    var thisPath = fis.util.realpath(process.cwd()),
+        filename = "tch-conf.js",
+        confFilePath = thisPath+"/"+filename,
+        cwd = thisPath,pos = cwd.length;
+    do {
+        cwd  = cwd.substring(0, pos);
+        if(fis.util.exists(confFilePath)){
+            root = cwd;
+            break;
+        } else {
+            confFilePath = false;
+            pos = cwd.lastIndexOf('/');
+        }
+    } while(pos > 0);
+    require(confFilePath);
+
     commander
         .option('-d, --dest <names>', 'release output destination', String, fis.config.get('server.root', "./output"))
         .option('-m, --md5 [level]', 'md5 release option', Number)
@@ -163,8 +160,7 @@ exports.register = function(commander){
         .option('-w, --watch', 'monitor the changes of project')
         .option('-L, --live', 'automatically reload your browser')
         .option('-c, --clean', 'clean compile cache', Boolean, false)
-        .option('-r, --root <path>', 'set project root',serverRoot)
-        .option('-f, --file <filename>', 'set fis-conf file',fis.config.get('server.file', "fis-conf.js"))
+        .option('-r, --root <path>', 'set project root',fis.config.get('server.root', "."))
         .option('-u, --unique', 'use unique compile caching', Boolean, false)
         .option('--verbose', 'enable verbose output', Boolean, false)
         .action(function(){
@@ -174,7 +170,7 @@ exports.register = function(commander){
             if(options.verbose){
                 fis.log.level = fis.log.L_ALL;
             }
-            var root, conf, filename = 'fis-conf.js';
+            var root, conf;
             if(options.file){
                 if(fis.util.isFile(options.file)){
                     conf = fis.util.realpath(options.file);
@@ -184,48 +180,13 @@ exports.register = function(commander){
             }
             if(options.root){
                 root = fis.util.realpath(options.root);
-                if(fis.util.isDir(root)){
-                    if(!conf && fis.util.isFile(root + '/' + filename)){
-                        conf = root + '/' + filename;
-                    }
-                    delete options.root;
-                } else {
-                    fis.log.error('invalid project root path [' + options.root + ']');
-                }
             } else {
                 root = fis.util.realpath(process.cwd());
-                if(!conf){
-                    //try to find fis-conf.js
-                    var cwd = root, pos = cwd.length;
-                    do {
-                        cwd  = cwd.substring(0, pos);
-                        conf = cwd + '/' + filename;
-                        if(fis.util.exists(conf)){
-                            root = cwd;
-                            break;
-                        } else {
-                            conf = false;
-                            pos = cwd.lastIndexOf('/');
-                        }
-                    } while(pos > 0);
-                }
             }
             
             //init project
             fis.project.setProjectRoot(root);
-            
             process.title = 'fis ' + process.argv.splice(2).join(' ') + ' [ ' + root + ' ]';
-            
-            if(conf){
-                var cache = fis.cache(conf, 'conf');
-                if(!cache.revert()){
-                    options.clean = true;
-                    cache.save();
-                }
-                require(conf);
-            } else {
-                fis.log.warning('missing config file [' + filename + ']');
-            }
             
             if(options.clean){
                 time(function(){
@@ -274,7 +235,7 @@ exports.register = function(commander){
                 });
                 //delete options.live;
             }
-            
+            //console.log(fis.config);
             switch (typeof options.md5){
                 case 'undefined':
                     options.md5 = 0;
@@ -287,7 +248,6 @@ exports.register = function(commander){
             }
             //md5 > 0, force release hash file
             options.hash = options.md5 > 0;
-            
             if(options.watch){
                 watch(options);
             } else {
