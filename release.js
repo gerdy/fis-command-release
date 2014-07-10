@@ -134,7 +134,7 @@ exports.register = function(commander){
         }
     }
     var serverRoot = (function(){
-        var confRootStr = ".",
+        var confRootStr = fis.config.get('server.root', "./output"),
             confRoot = fis.util.realpath(confRootStr);
         if(confRoot) return confRoot;
         fis.log.notice("正在尝试在 "+confRootStr+" 创建文件夹"); 
@@ -164,12 +164,11 @@ exports.register = function(commander){
         .option('-L, --live', 'automatically reload your browser')
         .option('-c, --clean', 'clean compile cache', Boolean, false)
         .option('-r, --root <path>', 'set project root',serverRoot)
-        .option('-f, --file <filename>', 'set fis-conf file')
+        .option('-f, --file <filename>', 'set fis-conf file',fis.config.get('server.file', "fis-conf.js"))
         .option('-u, --unique', 'use unique compile caching', Boolean, false)
         .option('--verbose', 'enable verbose output', Boolean, false)
         .action(function(){
             var options = arguments[arguments.length - 1];
-            
             fis.log.throw = true;
             //configure log
             if(options.verbose){
